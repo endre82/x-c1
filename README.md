@@ -1,7 +1,6 @@
-**This project has been deprecated, you can refer to [XScript](https://github.com/geekworm-com/xscript),  there is a better implementation in [XScript](https://github.com/geekworm-com/xscript)**
+**The original project has been deprecated**
 
-User Guide: https://wiki.geekworm.com/XScript
-
+User Guide: https://wiki.geekworm.com/X-C1_Software
 
 Update for Debian GNU/Linux 12 (bookworm) & Kernel Linux 6.6.x
 

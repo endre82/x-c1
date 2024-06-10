@@ -6,7 +6,7 @@ Update for Debian GNU/Linux 12 (bookworm) & Kernel Linux 6.6.x
 
 Using ```pigpio``` as ```sysfs``` is not supported any longer.
 
-# Required commands for setup
+#### Required commands for setup
 
 * ```
   sudo apt-get install pigpio

@@ -6,31 +6,29 @@ echo '#!/bin/bash
 SHUTDOWN=4
 REBOOTPULSEMINIMUM=200
 REBOOTPULSEMAXIMUM=600
-echo "$SHUTDOWN" > /sys/class/gpio/export
-echo "in" > /sys/class/gpio/gpio$SHUTDOWN/direction
+pigs modes ${SHUTDOWN} r
 BOOT=17
-echo "$BOOT" > /sys/class/gpio/export
-echo "out" > /sys/class/gpio/gpio$BOOT/direction
-echo "1" > /sys/class/gpio/gpio$BOOT/value
+pigs modes ${BOOT} w
+pigs w ${BOOT} 1
 
 echo "Power management script is running..."
 
 while [ 1 ]; do
-  shutdownSignal=$(cat /sys/class/gpio/gpio$SHUTDOWN/value)
-  if [ $shutdownSignal = 0 ]; then
+  shutdownSignal=$(pigs r ${SHUTDOWN})
+  if [ ${shutdownSignal} -eq 0 ]; then
     /bin/sleep 0.2
   else
     pulseStart=$(date +%s%N | cut -b1-13)
-    while [ $shutdownSignal = 1 ]; do
+    while [ ${shutdownSignal} -eq 1 ]; do
       /bin/sleep 0.02
-      if [ $(($(date +%s%N | cut -b1-13)-$pulseStart)) -gt $REBOOTPULSEMAXIMUM ]; then
+      if [ $(($(date +%s%N | cut -b1-13)-${pulseStart})) -gt ${REBOOTPULSEMAXIMUM} ]; then
         echo "Your device are shutting down", SHUTDOWN, ", halting Rpi ..."
         sudo poweroff
         exit
       fi
-      shutdownSignal=$(cat /sys/class/gpio/gpio$SHUTDOWN/value)
+      shutdownSignal=$(pigs r ${SHUTDOWN})
     done
-    if [ $(($(date +%s%N | cut -b1-13)-$pulseStart)) -gt $REBOOTPULSEMINIMUM ]; then
+    if [ $(($(date +%s%N | cut -b1-13)-${pulseStart})) -gt ${REBOOTPULSEMINIMUM} ]; then
       echo "Your device are rebooting", SHUTDOWN, ", recycling Rpi ..."
       sudo reboot
       exit
@@ -46,21 +44,20 @@ echo '#!/bin/bash
 
 BUTTON=27
 
-echo "$BUTTON" > /sys/class/gpio/export;
-echo "out" > /sys/class/gpio/gpio$BUTTON/direction
-echo "1" > /sys/class/gpio/gpio$BUTTON/value
+pigs modes ${BUTTON} w
+pigs w ${BUTTON} 1
 
 SLEEP=${1:-4}
 
 re='^[0-9\.]+$'
-if ! [[ $SLEEP =~ $re ]] ; then
+if ! [[ ${SLEEP} =~ ${re} ]] ; then
    echo "error: sleep time not a number" >&2; exit 1
 fi
 
 echo "Your device will shutting down in 4 seconds..."
-/bin/sleep $SLEEP
+/bin/sleep ${SLEEP}
 
-echo "0" > /sys/class/gpio/gpio$BUTTON/value
+pigs w ${BUTTON} 0
 ' > /usr/local/bin/x-c1-softsd.sh
 sudo chmod +x /usr/local/bin/x-c1-softsd.sh
 
@@ -83,8 +80,8 @@ echo "#!/bin/bash
 
 # Print the IP address
 _IP=$(hostname -I) || true
-if [ "$_IP" ]; then
-  printf "My IP address is %s\n" "$_IP"
+if [ "${_IP}" ]; then
+  printf "My IP address is %s\n" "${_IP}"
 fi
 
 /etc/x-c1-pwr.sh &
